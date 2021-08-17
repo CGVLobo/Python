@@ -7,6 +7,7 @@ class ClientDao:
 
     def insert(self,client):
         query="insert into client values ('"+client["name"]+"',"+str(client["age"])+")"
+        print(query)
         self.handler.executeQuery(query)
     def delete(self,clientId):
         query="delete from client where id="+str(clientId)
@@ -21,7 +22,7 @@ class ClientDao:
         for currentClient in result:
             newClient=Client(currentClient[1],currentClient[2])
             newClient.setId(currentClient[0])
-            clientList.append(newClient)
+            clientList.append(newClient.toDict())
         return clientList
         
     def findOne(self,clientId):
