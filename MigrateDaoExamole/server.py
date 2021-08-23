@@ -1,10 +1,30 @@
 from flask import Flask,request,jsonify
 from Class.dao.ClientDao import ClientDao
 from Class.model.Client import Client
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
+
 app=Flask(__name__)
+app.config["JWT_SECRET_KEY"]="qwerty"
+jwt=JWTManager(app)
+
+@app.route("/login",methods=["POST"])
+def login():
+    username=request.json.get("username",None)
+    passwd=request.json.get("passwd",None)
+    #print(hash(passwd))
+    #validar usuario
+    if username!="test" or passwd!="test":
+        return jsonify({"msg":"no existe usuario"}),401
+    
+    access_token=create_access_token(identity=username)
+    return jsonify(access_token=access_token)
 
 
 @app.route("/client",methods=["GET"])
+@jwt_required()
 def clientList():
     dao=ClientDao()
     try:
@@ -18,6 +38,7 @@ def clientList():
             "msg":"Problemas en la consulta"
         }
 @app.route("/client",methods=["POST"])
+@jwt_required()
 def insert():
     dao=ClientDao()
     data=request.get_json()
